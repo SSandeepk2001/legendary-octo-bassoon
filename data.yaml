@@ -1,0 +1,8 @@
+# Update these paths and class names for your actual dataset.
+path: ../dataset
+train: images/train
+val: images/val
+
+names:
+  0: scrap
+  1: potential_hazard

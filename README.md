@@ -1,26 +1,76 @@
-# Sandeep Kumar | CAD AI/ML Engineering Portfolio
+# Industrial Scrap Safety Detection with YOLO
 
-Three project repositories aligned with CAD/EDA automation, engineering log intelligence, and industrial computer vision.
+A clean training and inference scaffold for object detection in industrial scrap imagery. The intended use is to help flag visible objects/hazards for human review—not to replace safety procedures or qualified inspectors.
 
-## Projects
+> **Dataset and metrics:** No original annotated dataset or trained model weights are included. Add your authorized dataset and evaluate the model before reporting accuracy, mAP, or inspection-effort improvements. Resume figures must be supported by your actual experiment records.
 
-| Project | Focus | Stack |
-|---|---|---|
-| [AI-Powered CAD Log Failure Prediction & Runtime Analytics](./ai-powered-cad-log-analytics/) | Parse EDA-style logs, classify failures, estimate runtime, flag anomalies, visualize trends | Python, Pandas, scikit-learn, Streamlit |
-| [EDA Tool Log Assistant (RAG + ML)](./eda-tool-log-assistant/) | Analyze Yosys/Verilator logs and retrieve relevant troubleshooting guidance through an API | Python, FastAPI, FAISS, Docker, Shell/Tcl |
-| [Industrial Scrap Safety Detection](./industrial-scrap-safety-detection/) | Train/evaluate YOLO object detection for industrial scrap/safety imagery | Python, Ultralytics YOLO, OpenCV |
+## Features
 
-## Important notes
+- Ultralytics YOLO training entry point.
+- Inference on an image or directory.
+- Evaluation command for a trained checkpoint.
+- Dataset YAML template and clear folder layout.
+- Human-review disclaimer and data provenance notes.
 
-- These are portfolio starter repositories with runnable baseline implementations and clear extension points.
-- Sample EDA logs are synthetic examples created for demonstration; they are not proprietary Qualcomm or production logs.
-- The safety project includes training/inference scaffolding. Use your actual annotated dataset and trained weights before reporting model metrics.
-- Do not claim a metric, model performance, dataset size, or deployment as completed unless you have personally run and verified it.
+## Setup
 
-## Quick start
+```bash
+python -m venv .venv
+# Windows: .venv\Scripts\activate
+# Linux/macOS: source .venv/bin/activate
+pip install -r requirements.txt
+```
 
-Open each project folder and follow its README. Each repository includes a dedicated dependency file and tests or validation instructions.
+## Dataset layout
 
-## Suggested GitHub presentation
+Place images and YOLO-format label files in the following structure:
 
-Publish each project as a separate public repository, use the project README as the landing page, add screenshots only after running the app, and pin the two CAD/EDA projects first for the Qualcomm CAD AI/ML role.
+```text
+dataset/
+  images/
+    train/
+    val/
+  labels/
+    train/
+    val/
+```
+
+Each label line must use `class_id x_center y_center width height` with normalized coordinates. Update `data.yaml` with your actual class names and dataset paths.
+
+## Train
+
+```bash
+python src/train.py --data data.yaml --model yolov8n.pt --epochs 50 --imgsz 640
+```
+
+## Inference
+
+```bash
+python src/predict.py --weights runs/detect/train/weights/best.pt --source path/to/image-or-folder --output outputs
+```
+
+## Evaluate
+
+```bash
+python src/evaluate.py --weights runs/detect/train/weights/best.pt --data data.yaml
+```
+
+## Responsible use
+
+- Test on a representative held-out dataset and report mAP50, mAP50-95, precision, recall, and per-class errors.
+- Track false negatives carefully; missed hazards can be consequential.
+- Treat model output as decision support. Human safety procedures and trained personnel remain authoritative.
+- Do not upload identifiable, restricted, or proprietary facility images without authorization.
+
+## Suggested results table
+
+| Metric | Your measured result |
+|---|---|
+| Dataset version / split | Fill after experiment |
+| Number of annotated images | Fill from dataset |
+| Precision / Recall | Fill from evaluation |
+| mAP@0.5 | Fill from evaluation |
+| mAP@0.5:0.95 | Fill from evaluation |
+| Inference hardware / latency | Fill after benchmarking |
+
+Do not leave placeholder metrics in the final resume or claim results before running the experiment.
